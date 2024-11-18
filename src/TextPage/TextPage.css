@@ -40,6 +40,28 @@
     transition: transform 0.25s ease;
 }
 
+.text-page-container .text-div::after {
+    content: "Copied!";
+    position: absolute;
+    bottom: 2.75rem;
+    left: 1rem;
+    background-color: var(--bg-inv);
+    color: var(--bg-pri);
+    padding: 0.25rem 0.5rem;
+    border-radius: 5px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    transform-origin: left bottom;
+    z-index: 1;
+    scale: 0;
+    pointer-events: none;
+    transition: scale 0.25s ease;
+}
+
+.text-page-container .text-div:has(.copied)::after {
+    scale: 1;
+}
+
 .text-page-container .text-div>svg:last-child {
     left: 3rem;
 }

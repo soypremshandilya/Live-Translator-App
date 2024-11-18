@@ -43,8 +43,10 @@ export default function TextPage() {
         setSpeaking(false)
     }
 
-    function handleCopy(text) {
+    function handleCopy(event, text) {
+        event.target.classList.add('copied')
         navigator.clipboard.writeText(text)
+        setTimeout(() => event.target.classList.remove('copied'), 2000)
     }
 
     function switchLang() {
@@ -60,13 +62,13 @@ export default function TextPage() {
         <div className='text-page-container'>
             <div className='text-div'>
                 <textarea value={text1} onChange={e => setText1(e.target.value)} placeholder='Enter text here' />
-                <MdOutlineContentCopy onClick={() => handleCopy(text1)} />
+                <MdOutlineContentCopy onClick={e => handleCopy(e, text1)} />
                 {speaking1 ? <span onClick={() => stopSpeak(setSpeaking1)}><FaStop /></span>
                     : <HiOutlineSpeakerWave onClick={() => handleSpeak(text1, lang1, selectedVoice1, setSpeaking1)} />}
             </div>
             <div className='text-div'>
                 <textarea value={text2} placeholder='Translated text will appear here' disabled />
-                <MdOutlineContentCopy onClick={() => handleCopy(text2)} />
+                <MdOutlineContentCopy onClick={e => handleCopy(e, text2)} />
                 {speaking2 ? <span onClick={() => stopSpeak(setSpeaking2)}><FaStop /></span>
                     : <HiOutlineSpeakerWave onClick={() => handleSpeak(text2, lang2, selectedVoice2, setSpeaking2)} />}
             </div>
