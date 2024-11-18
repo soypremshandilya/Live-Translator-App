@@ -25,6 +25,10 @@ export default function VoicePage() {
         setTexts([{ text1: placeHolder1, text2: placeHolder2 }])
     }, [lang1, lang2])
 
+    useEffect(() => {
+        textsRef.current?.scrollIntoView({ behavior: 'smooth' })
+    }, [texts])
+
     const speechRecognition = useMemo(() => window.SpeechRecognition || window.webkitSpeechRecognition, [])
     const recognition = useMemo(() => (new speechRecognition()), [])
 
@@ -35,6 +39,7 @@ export default function VoicePage() {
             recognition.start()
 
             recognition.onstart = () => setMic1(true)
+            recognition.onspeechend = () => recognition.stop()
             recognition.onaudioend = () => timeoutRef.current = setTimeout(() => setMic1(false), 1000)
 
             recognition.onresult = event => {
@@ -43,7 +48,6 @@ export default function VoicePage() {
                 const transcript = event.results[current][0].transcript
                 handleTranslate(transcript, lang2, controller).then(resText => {
                     setTexts(prevTexts => [...prevTexts, { text1: transcript, text2: resText }])
-                    textsRef.current.scrollTop = textsRef.current.scrollHeight
                     handleSpeak(resText, lang2, selectedVoice2).onend = () => setTimeout(() => {
                         setMic1(false)
                         handleRecord2()
@@ -66,6 +70,7 @@ export default function VoicePage() {
             recognition.start()
 
             recognition.onstart = () => setMic2(true)
+            recognition.onspeechend = () => recognition.stop()
             recognition.onaudioend = () => timeoutRef.current = setTimeout(() => setMic2(false), 1000)
 
             recognition.onresult = event => {
@@ -74,7 +79,6 @@ export default function VoicePage() {
                 const transcript = event.results[current][0].transcript
                 handleTranslate(transcript, lang1, controller).then(resText => {
                     setTexts(prevTexts => [...prevTexts, { text1: resText, text2: transcript }])
-                    textsRef.current.scrollTop = textsRef.current.scrollHeight
                     handleSpeak(resText, lang1, selectedVoice1).onend = () => setTimeout(() => {
                         setMic2(false)
                         handleRecord1()
@@ -123,8 +127,9 @@ export default function VoicePage() {
 
     return (
         <div className="voice-page-container">
-            <div className='texts-container' ref={textsRef}>
+            <div className='texts-container'>
                 {transcripts}
+                <span className='scroll-to-bottom' ref={textsRef} />
             </div>
             <div className='bottom-container'>
                 <DropDown items={languageOptions} selected={lang1} setSelected={setLang1} name='lang1' />

@@ -98,6 +98,7 @@
     align-items: center;
     justify-content: center;
     background-color: transparent;
+    color: currentColor;
     border: none;
     outline: none;
     font-size: 1.25rem;

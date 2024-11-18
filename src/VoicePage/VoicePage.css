@@ -21,6 +21,10 @@
     overflow: scroll;
 }
 
+.voice-page-container .texts-container .scroll-to-bottom {
+    height: 0;
+}
+
 .voice-page-container .bottom-container {
     width: 100%;
     display: grid;
@@ -63,6 +67,7 @@
     align-items: center;
     justify-content: center;
     background-color: transparent;
+    color: currentColor;
     border: none;
     outline: none;
     font-size: 1.25rem;
