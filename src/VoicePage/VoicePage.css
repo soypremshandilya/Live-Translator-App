@@ -74,6 +74,10 @@
     fill: #ff3333;
 }
 
+.voice-page-container .stop-div.voice:has(button:active)>svg {
+    scale: 0.95;
+}
+
 .voice-page-container button.switch-btn {
     width: 2rem;
     height: 2rem;
@@ -119,5 +123,14 @@
     .voice-page-container button.cancel:active {
         background-color: #ff3333;
         transform: scale(0.95);
+    }
+
+    .voice-page-container .stop-div.voice:has(button:hover)>svg {
+        fill: #ff0000;
+    }
+
+    .voice-page-container .stop-div.voice:has(button:active)>svg {
+        fill: #ff3333;
+        scale: 0.95;
     }
 }

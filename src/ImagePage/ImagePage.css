@@ -41,6 +41,7 @@
     margin-block: auto;
     border-radius: 50%;
     position: relative;
+    filter: drop-shadow(0 0 10px rgb(255, 0, 0, 0.75));
 }
 
 .stop-div>svg {
@@ -54,7 +55,7 @@
     transform-origin: top left;
     z-index: -1;
     animation: rotation infinite 10s linear forwards;
-    transition: fill 0.25s ease;
+    transition: fill 0.25s ease, scale 0.25s ease;
 }
 
 @keyframes rotation {
@@ -76,7 +77,6 @@
     outline: none;
     color: #fff;
     background-color: #ff0000;
-    box-shadow: 0 0 30px rgb(255, 0, 0, 0.75);
     transition: background-color 0.25s ease, transform 0.25s ease;
 }
 
@@ -84,12 +84,16 @@
     background-color: #ff3333;
 }
 
+.image-page-container .stop-btn:active {
+    transform: scale(0.95);
+}
+
 .image-page-container .stop-div:has(.stop-btn:hover)>svg {
     fill: #ff3333;
 }
 
-.image-page-container .stop-btn:active {
-    transform: scale(0.95);
+.image-page-container .stop-div:has(.stop-btn:active)>svg {
+    scale: 0.95;
 }
 
 .image-page-container .translate-textbox {
@@ -223,5 +227,6 @@
 
     .image-page-container .stop-div:has(.stop-btn:active)>svg {
         fill: #ff3333;
+        scale: 0.95;
     }
 }
