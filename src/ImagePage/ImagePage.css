@@ -54,6 +54,7 @@
     transform-origin: top left;
     z-index: -1;
     animation: rotation infinite 10s linear forwards;
+    transition: fill 0.25s ease;
 }
 
 @keyframes rotation {

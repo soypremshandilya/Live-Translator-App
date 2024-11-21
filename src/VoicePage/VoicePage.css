@@ -35,7 +35,7 @@
     row-gap: 2rem;
 }
 
-.voice-page-container .bottom-container button:last-child {
+.voice-page-container .bottom-container .last {
     grid-column: 3;
 }
 
@@ -52,12 +52,26 @@
     border: none;
     border-radius: 50%;
     cursor: pointer;
-    transition: background-color 0.25s ease, transform 0.25s ease;
+    transition: background-color 0.25s ease, transform 0.25s ease, height 0.5s ease, width 0.5s ease;
 }
 
 .voice-page-container button.cancel {
     background-color: #ff0000;
     color: #fff;
+}
+
+.voice-page-container button.cancel.processing {
+    height: 3.75rem;
+    width: 3.75rem;
+}
+
+.voice-page-container .stop-div.voice>svg {
+    height: 4.5rem;
+    width: 4.5rem;
+}
+
+.voice-page-container .stop-div.voice:has(button:hover)>svg {
+    fill: #ff3333;
 }
 
 .voice-page-container button.switch-btn {
