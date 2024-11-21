@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import handleTranslate from '../Utils/Conn'
 import useVoices from '../Utils/Voices'
 import { languages } from '../Db/Languages'
@@ -17,14 +17,20 @@ export default function TextPage() {
     const [speaking1, setSpeaking1] = useState(false)
     const [speaking2, setSpeaking2] = useState(false)
     const { lang1, setLang1, lang2, setLang2, selectedVoice1, selectedVoice2 } = useContext(useVoices)
+    const translatedRef = useRef(null)
     const controller = new AbortController()
 
     useEffect(() => {
-        if (text1) handleTranslate(text1, lang2, controller).then(resText => setText2(resText))
-            .catch(error => {
+        if (text1) {
+            translatedRef.current.classList.add('loading')
+            handleTranslate(text1, lang2, controller).then(resText => {
+                setText2(resText)
+                translatedRef.current.classList.remove('loading')
+            }).catch(error => {
                 if (error.name === 'AbortError') console.log('Aborted')
                 else throw error
             })
+        }
         return () => controller.abort()
     }, [text1, lang1, lang2])
 
@@ -66,7 +72,7 @@ export default function TextPage() {
                 {speaking1 ? <span onClick={() => stopSpeak(setSpeaking1)}><FaStop /></span>
                     : <HiOutlineSpeakerWave onClick={() => handleSpeak(text1, lang1, selectedVoice1, setSpeaking1)} />}
             </div>
-            <div className='text-div'>
+            <div className='text-div' ref={translatedRef}>
                 <textarea value={text2} placeholder='Translated text will appear here' disabled />
                 <MdOutlineContentCopy onClick={e => handleCopy(e, text2)} />
                 {speaking2 ? <span onClick={() => stopSpeak(setSpeaking2)}><FaStop /></span>
