@@ -5,6 +5,7 @@ import { languages } from '../Db/Languages'
 import DropDown from '../Components/DropDown/DropDown'
 import Textbox from '../Components/Textbox/Textbox'
 import { TiMicrophone } from "react-icons/ti"
+import { BsFillPatchExclamationFill } from "react-icons/bs"
 import { FaStop } from "react-icons/fa6"
 import { GoArrowSwitch } from "react-icons/go"
 import './VoicePage.css'
@@ -14,6 +15,7 @@ export default function VoicePage() {
     const [texts, setTexts] = useState([])
     const [mic1, setMic1] = useState(false)
     const [mic2, setMic2] = useState(false)
+    const [processing, setProcessing] = useState(false)
     const textsRef = useRef(null)
     const timeoutRef = useRef(null)
     const { lang1, setLang1, lang2, setLang2, voices, selectedVoice1, selectedVoice2 } = useContext(useVoices)
@@ -25,6 +27,10 @@ export default function VoicePage() {
         setTexts([{ text1: placeHolder1, text2: placeHolder2 }])
     }, [lang1, lang2])
 
+    useEffect(() => {
+        textsRef.current?.scrollIntoView({ behavior: 'smooth' })
+    }, [texts])
+
     const speechRecognition = useMemo(() => window.SpeechRecognition || window.webkitSpeechRecognition, [])
     const recognition = useMemo(() => (new speechRecognition()), [])
 
@@ -35,17 +41,19 @@ export default function VoicePage() {
             recognition.start()
 
             recognition.onstart = () => setMic1(true)
+            recognition.onspeechend = () => recognition.stop()
             recognition.onaudioend = () => timeoutRef.current = setTimeout(() => setMic1(false), 1000)
 
             recognition.onresult = event => {
                 clearTimeout(timeoutRef.current)
+                setProcessing(true)
                 const current = event.resultIndex
                 const transcript = event.results[current][0].transcript
                 handleTranslate(transcript, lang2, controller).then(resText => {
                     setTexts(prevTexts => [...prevTexts, { text1: transcript, text2: resText }])
-                    textsRef.current.scrollTop = textsRef.current.scrollHeight
                     handleSpeak(resText, lang2, selectedVoice2).onend = () => setTimeout(() => {
                         setMic1(false)
+                        setProcessing(false)
                         handleRecord2()
                     }, 500)
                 }).catch(error => {
@@ -66,17 +74,19 @@ export default function VoicePage() {
             recognition.start()
 
             recognition.onstart = () => setMic2(true)
+            recognition.onspeechend = () => recognition.stop()
             recognition.onaudioend = () => timeoutRef.current = setTimeout(() => setMic2(false), 1000)
 
             recognition.onresult = event => {
                 clearTimeout(timeoutRef.current)
+                setProcessing(true)
                 const current = event.resultIndex
                 const transcript = event.results[current][0].transcript
                 handleTranslate(transcript, lang1, controller).then(resText => {
                     setTexts(prevTexts => [...prevTexts, { text1: resText, text2: transcript }])
-                    textsRef.current.scrollTop = textsRef.current.scrollHeight
                     handleSpeak(resText, lang1, selectedVoice1).onend = () => setTimeout(() => {
                         setMic2(false)
+                        setProcessing(false)
                         handleRecord1()
                     }, 500)
                 }).catch(error => {
@@ -105,6 +115,7 @@ export default function VoicePage() {
         window.speechSynthesis.cancel()
         setMic1(false)
         setMic2(false)
+        setProcessing(false)
     }
 
     function switchLang() {
@@ -123,17 +134,34 @@ export default function VoicePage() {
 
     return (
         <div className="voice-page-container">
-            <div className='texts-container' ref={textsRef}>
+            <div className='texts-container'>
                 {transcripts}
+                <span className='scroll-to-bottom' ref={textsRef} />
             </div>
             <div className='bottom-container'>
                 <DropDown items={languageOptions} selected={lang1} setSelected={setLang1} name='lang1' />
                 <button type='button' className='switch-btn' onClick={switchLang}>{<GoArrowSwitch />}</button>
                 <DropDown items={languageOptions} selected={lang2} setSelected={setLang2} name='lang2' />
-                {mic1 ? <button type='button' className='cancel' onClick={stop}>{<FaStop />}</button>
-                    : <button type='button' className='record-btn' onClick={handleRecord1}>{<TiMicrophone size='1.5rem' />}</button>}
-                {mic2 ? <button type='button' className='cancel' onClick={stop}>{<FaStop />}</button>
-                    : <button type='button' className='record-btn' onClick={handleRecord2}>{<TiMicrophone size='1.5rem' />}</button>}
+                {mic1 ?
+                    <div className='stop-div voice'>
+                        <BsFillPatchExclamationFill />
+                        <button type='button' className={`cancel${processing ? ' processing' : ''}`} onClick={stop}>
+                            {<FaStop />}
+                        </button>
+                    </div>
+                    : <button type='button' className='record-btn' onClick={handleRecord1}>
+                        {<TiMicrophone size='1.5rem' />}
+                    </button>}
+                {mic2 ?
+                    <div className='stop-div voice last'>
+                        <BsFillPatchExclamationFill />
+                        <button type='button' className={`cancel${processing ? ' processing' : ''}`} onClick={stop}>
+                            {<FaStop />}
+                        </button>
+                    </div>
+                    : <button type='button' className='record-btn last' onClick={handleRecord2}>
+                        {<TiMicrophone size='1.5rem' />}
+                    </button>}
             </div>
         </div>
     )

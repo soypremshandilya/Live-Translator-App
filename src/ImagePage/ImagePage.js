@@ -71,8 +71,10 @@ export default function ImagePage() {
         setSpeaking(false)
     }
 
-    function handleCopy() {
+    function handleCopy(event) {
+        event.target.classList.add('copied')
         navigator.clipboard.writeText(translatedText)
+        setTimeout(() => event.target.classList.remove('copied'), 2000)
     }
 
     return (
