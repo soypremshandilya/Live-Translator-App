@@ -14,10 +14,10 @@ export function VoicesProvider({ children }) {
     const voices2 = useMemo(() => voices.filter(({ lang }) => lang.slice(0, 2) === lang2), [lang2, voices])
 
     useEffect(() => {
-        const voices = window.speechSynthesis.getVoices()
+        const voices = window.speechSynthesis?.getVoices()
         if (Array.isArray(voices) && voices.length) setVoices(voices)
-        else window.speechSynthesis.onvoiceschanged = () => setVoices(window.speechSynthesis.getVoices())
-        return () => window.speechSynthesis.onvoiceschanged = null
+        else window.speechSynthesis?.onvoiceschanged = () => setVoices(window.speechSynthesis?.getVoices())
+        return () => window.speechSynthesis?.onvoiceschanged = null
     }, [])
 
     useEffect(() => {
