@@ -42,8 +42,8 @@ export default function BottomSheet({ lang1, lang2, voices1, voices2, setSelecte
     }
 
     function switchMode() {
-        setMode(!mode)
         localStorage.setItem('mode', !mode)
+        setMode(!mode)
     }
 
     return (

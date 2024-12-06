@@ -1,7 +1,11 @@
 import { useEffect, useState } from "react"
 
 export default function useMode() {
-    const [mode, setMode] = useState(window.matchMedia('(prefers-color-scheme: light)').matches)
+
+    const localMode = localStorage.getItem('mode') ? JSON.parse(localStorage.getItem('mode')) :
+        window.matchMedia('(prefers-color-scheme: light)').matches
+
+    const [mode, setMode] = useState(localMode)
 
     useEffect(() => {
         let check = window.matchMedia('(prefers-color-scheme: light)')
@@ -12,11 +16,9 @@ export default function useMode() {
         return () => check.removeEventListener('change', change)
     }, [])
 
-    useEffect(() => {
-        if (localStorage.getItem('mode')) setMode(JSON.parse(localStorage.getItem('mode')))
-    }, [])
-
     document.querySelector('meta[name="theme-color"]').content = mode ? '#ededed' : '#121212'
+
+    if (localStorage.getItem('mode')) window.AndroidInterface?.setTheme(mode ? 'light' : 'dark')
 
     return { mode, setMode }
 }
