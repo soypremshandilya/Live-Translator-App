@@ -29,6 +29,7 @@ export default function TextPage() {
             }).catch(error => {
                 if (error.name === 'AbortError') console.log('Aborted')
                 else throw error
+                translatedRef.current.classList.remove('loading')
             })
         }
         return () => controller.abort()
