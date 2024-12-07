@@ -15,9 +15,11 @@ export default function VoicePage() {
     const [texts, setTexts] = useState([])
     const [mic1, setMic1] = useState(false)
     const [mic2, setMic2] = useState(false)
+    const [audioCircle, setAudioCircle] = useState(1)
     const [processing, setProcessing] = useState(false)
     const textsRef = useRef(null)
     const timeoutRef = useRef(null)
+    const streamRef = useRef(null)
     const { lang1, setLang1, lang2, setLang2, voices, selectedVoice1, selectedVoice2 } = useContext(useVoices)
     const controller = new AbortController()
 
@@ -40,9 +42,17 @@ export default function VoicePage() {
             recognition.lang = lang1
             recognition.start()
 
-            recognition.onstart = () => setMic1(true)
+            recognition.onstart = () => {
+                setMic1(true)
+                visualizer()
+            }
             recognition.onspeechend = () => recognition.stop()
-            recognition.onaudioend = () => timeoutRef.current = setTimeout(() => setMic1(false), 1000)
+            recognition.onaudioend = () => {
+                timeoutRef.current = setTimeout(() => setMic1(false), 1000)
+                streamRef.current?.getTracks().forEach(track => track.stop())
+                streamRef.current = null
+                setAudioCircle(1)
+            }
 
             recognition.onresult = event => {
                 clearTimeout(timeoutRef.current)
@@ -73,9 +83,17 @@ export default function VoicePage() {
             recognition.lang = lang2
             recognition.start()
 
-            recognition.onstart = () => setMic2(true)
+            recognition.onstart = () => {
+                setMic2(true)
+                visualizer()
+            }
             recognition.onspeechend = () => recognition.stop()
-            recognition.onaudioend = () => timeoutRef.current = setTimeout(() => setMic2(false), 1000)
+            recognition.onaudioend = () => {
+                timeoutRef.current = setTimeout(() => setMic2(false), 1000)
+                streamRef.current?.getTracks().forEach(track => track.stop())
+                streamRef.current = null
+                setAudioCircle(1)
+            }
 
             recognition.onresult = event => {
                 clearTimeout(timeoutRef.current)
@@ -100,6 +118,32 @@ export default function VoicePage() {
         }
     }
 
+    function visualizer() {
+        navigator.mediaDevices.getUserMedia({ audio: true })
+            .then(stream => {
+                streamRef.current = stream
+                const audioContext = new AudioContext()
+                const audioSource = audioContext.createMediaStreamSource(stream)
+                const analyser = audioContext.createAnalyser()
+                analyser.fftSize = 256
+                const bufferLength = analyser.frequencyBinCount
+                const dataArray = new Uint8Array(bufferLength)
+                audioSource.connect(analyser)
+
+                function visualize() {
+                    if (!streamRef.current) return
+                    requestAnimationFrame(visualize)
+                    analyser.getByteTimeDomainData(dataArray)
+                    const sum = dataArray.reduce((acc, value) => acc + ((value / 128 - 1) ** 2), 0)
+                    const rms = Math.sqrt(sum / bufferLength)
+                    const logRMS = Math.log10(rms + 1)
+                    const scale = 1 + logRMS * 25
+                    setAudioCircle(scale)
+                }
+                visualize()
+            })
+    }
+
     function handleSpeak(text, lang, selectedVoice) {
         if (!text) return
         const utterance = new SpeechSynthesisUtterance(text)
@@ -113,9 +157,13 @@ export default function VoicePage() {
         recognition.abort()
         controller.abort()
         window.speechSynthesis.cancel()
+        streamRef.current?.getTracks().forEach(track => track.stop())
+        streamRef.current = null
+        setAudioCircle(1)
         setMic1(false)
         setMic2(false)
         setProcessing(false)
+        clearTimeout(timeoutRef.current)
     }
 
     function switchLang() {
@@ -139,11 +187,13 @@ export default function VoicePage() {
                 <span className='scroll-to-bottom' ref={textsRef} />
             </div>
             <div className='bottom-container'>
-                <DropDown items={languageOptions} selected={lang1} setSelected={setLang1} name='lang1' />
+                <DropDown items={languageOptions} selected={lang1} setSelected={setLang1} name='lang1'
+                    classname='voice-lang' />
                 <button type='button' className='switch-btn' onClick={switchLang}>{<GoArrowSwitch />}</button>
-                <DropDown items={languageOptions} selected={lang2} setSelected={setLang2} name='lang2' />
+                <DropDown items={languageOptions} selected={lang2} setSelected={setLang2} name='lang2'
+                    classname='voice-lang' />
                 {mic1 ?
-                    <div className='stop-div voice'>
+                    <div className='stop-div voice' style={{ '--scale': audioCircle }}>
                         <BsFillPatchExclamationFill />
                         <button type='button' className={`cancel${processing ? ' processing' : ''}`} onClick={stop}>
                             {<FaStop />}
@@ -153,7 +203,7 @@ export default function VoicePage() {
                         {<TiMicrophone size='1.5rem' />}
                     </button>}
                 {mic2 ?
-                    <div className='stop-div voice last'>
+                    <div className='stop-div voice last' style={{ '--scale': audioCircle }}>
                         <BsFillPatchExclamationFill />
                         <button type='button' className={`cancel${processing ? ' processing' : ''}`} onClick={stop}>
                             {<FaStop />}

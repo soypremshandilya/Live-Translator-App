@@ -39,6 +39,10 @@
     grid-column: 3;
 }
 
+.voice-page-container .voice-lang {
+    z-index: 1;
+}
+
 .voice-page-container button.record-btn,
 .voice-page-container button.cancel {
     height: 4.75rem;
@@ -63,6 +67,20 @@
 .voice-page-container button.cancel.processing {
     height: 3.75rem;
     width: 3.75rem;
+}
+
+.stop-div.voice::after {
+    content: '';
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    background-color: rgba(255, 0, 0, 0.2);
+    border-radius: 50%;
+    scale: var(--scale);
+    transition: scale 0.075s linear;
 }
 
 .voice-page-container .stop-div.voice>svg {
