@@ -118,30 +118,28 @@ export default function VoicePage() {
         }
     }
 
-    function visualizer() {
-        navigator.mediaDevices.getUserMedia({ audio: true })
-            .then(stream => {
-                streamRef.current = stream
-                const audioContext = new AudioContext()
-                const audioSource = audioContext.createMediaStreamSource(stream)
-                const analyser = audioContext.createAnalyser()
-                analyser.fftSize = 256
-                const bufferLength = analyser.frequencyBinCount
-                const dataArray = new Uint8Array(bufferLength)
-                audioSource.connect(analyser)
+    async function visualizer() {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+        streamRef.current = stream
+        const audioContext = new AudioContext()
+        const audioSource = audioContext.createMediaStreamSource(stream)
+        const analyser = audioContext.createAnalyser()
+        analyser.fftSize = 256
+        const bufferLength = analyser.frequencyBinCount
+        const dataArray = new Uint8Array(bufferLength)
+        audioSource.connect(analyser)
 
-                function visualize() {
-                    if (!streamRef.current) return
-                    requestAnimationFrame(visualize)
-                    analyser.getByteTimeDomainData(dataArray)
-                    const sum = dataArray.reduce((acc, value) => acc + ((value / 128 - 1) ** 2), 0)
-                    const rms = Math.sqrt(sum / bufferLength)
-                    const logRMS = Math.log10(rms + 1)
-                    const scale = 1 + logRMS * 25
-                    setAudioCircle(scale)
-                }
-                visualize()
-            })
+        function visualize() {
+            if (!streamRef.current) return
+            requestAnimationFrame(visualize)
+            analyser.getByteTimeDomainData(dataArray)
+            const sum = dataArray.reduce((acc, value) => acc + ((value / 128 - 1) ** 2), 0)
+            const rms = Math.sqrt(sum / bufferLength)
+            const logRMS = Math.log10(rms + 1)
+            const scale = 1 + logRMS * 25
+            setAudioCircle(scale)
+        }
+        visualize()
     }
 
     function handleSpeak(text, lang, selectedVoice) {

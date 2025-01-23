@@ -80,7 +80,7 @@
     background-color: rgba(255, 0, 0, 0.2);
     border-radius: 50%;
     scale: var(--scale);
-    transition: scale 0.075s linear;
+    transition: scale 0.25s linear;
 }
 
 .voice-page-container .stop-div.voice>svg {

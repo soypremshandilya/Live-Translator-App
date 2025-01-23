@@ -72,9 +72,11 @@ export default function ImagePage() {
     }
 
     function handleCopy(event) {
-        event.target.classList.add('copied')
-        navigator.clipboard.writeText(translatedText)
-        setTimeout(() => event.target.classList.remove('copied'), 2000)
+        if (translatedText) {
+            navigator.clipboard.writeText(translatedText)
+            event.target.classList.add('copied')
+            setTimeout(() => event.target.classList.remove('copied'), 2000)
+        }
     }
 
     return (

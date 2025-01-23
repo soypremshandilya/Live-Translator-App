@@ -23,14 +23,19 @@ export default function TextPage() {
     useEffect(() => {
         if (text1) {
             translatedRef.current.classList.add('loading')
-            handleTranslate(text1, lang2, controller).then(resText => {
+            handleTranslate(text1, lang2, controller).then(resText =>
                 setText2(resText)
-                translatedRef.current.classList.remove('loading')
-            }).catch(error => {
-                if (error.name === 'AbortError') console.log('Aborted')
-                else throw error
-                translatedRef.current.classList.remove('loading')
-            })
+            ).then(() => translatedRef.current.classList.remove('loading'))
+                .catch(error => {
+                    if (error.name !== 'AbortError') {
+                        translatedRef.current.classList.remove('loading')
+                        throw error
+                    }
+                })
+        }
+        else {
+            translatedRef.current.classList.remove('loading')
+            setText2('')
         }
         return () => controller.abort()
     }, [text1, lang1, lang2])
@@ -51,9 +56,11 @@ export default function TextPage() {
     }
 
     function handleCopy(event, text) {
-        event.target.classList.add('copied')
-        navigator.clipboard.writeText(text)
-        setTimeout(() => event.target.classList.remove('copied'), 2000)
+        if (text) {
+            navigator.clipboard.writeText(text)
+            event.target.classList.add('copied')
+            setTimeout(() => event.target.classList.remove('copied'), 2000)
+        }
     }
 
     function switchLang() {
