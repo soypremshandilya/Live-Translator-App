@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo, useRef, useState } from 'react'
+import { useContext, useEffect, useMemo, useRef, useState } from 'react'
 import handleTranslate from '../Utils/Conn'
 import useVoices from '../Utils/Voices'
 import { languages } from '../Db/Languages'

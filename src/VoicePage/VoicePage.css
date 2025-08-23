@@ -21,6 +21,10 @@
     overflow: scroll;
 }
 
+.voice-page-container .texts-container::-webkit-scrollbar {
+    display: none;
+}
+
 .voice-page-container .texts-container .scroll-to-bottom {
     height: 0;
 }

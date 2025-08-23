@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import handleTranslate, { handleUpload } from '../Utils/Conn'
 import imageCompression from 'browser-image-compression'
 import useVoices from '../Utils/Voices'

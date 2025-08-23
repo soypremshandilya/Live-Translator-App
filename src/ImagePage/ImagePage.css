@@ -116,6 +116,10 @@
     overflow-y: scroll;
 }
 
+.image-page-container .translate-textbox>p::-webkit-scrollbar {
+    display: none;
+}
+
 .image-page-container .translate-textbox>p:empty:before {
     content: "Translated text will appear here";
     color: grey;

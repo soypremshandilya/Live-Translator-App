@@ -49,6 +49,10 @@
     overflow: scroll;
 }
 
+.dropdown.open::-webkit-scrollbar {
+    display: none;
+}
+
 .dropdown-wrapper {
     padding: 0.5rem;
 }

@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useMemo, useRef } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef } from 'react'
 import './DropDown.css'
 
 export default function DropDown({ items, selected, setSelected, name, classname }) {

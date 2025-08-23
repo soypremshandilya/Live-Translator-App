@@ -31,6 +31,10 @@
     color: currentColor;
 }
 
+.text-page-container .text-div textarea::-webkit-scrollbar {
+    display: none;
+}
+
 .text-page-container .text-div>svg {
     position: absolute;
     bottom: 1rem;
